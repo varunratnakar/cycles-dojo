@@ -20,27 +20,27 @@ SOIL_WEATHER_DIR = "data/soil_weather"
 def run_cycles(params):
     cropland_df = pd.read_csv(CROPLAND_FILE)
     cropland_df.set_index(['country', 'admin1', 'admin2', 'admin3'], inplace=True)
-    
+
     df = pd.read_csv(RESOURCES_FILE)
     df.set_index(['country', 'admin1', 'admin2', 'admin3'], inplace=True)
     country_soil_points = df.loc[params["country"]]
-    
+
     # Run Cycles for all soil points in the country
     # - TODO: Should run in parallel
     first = True
     for index, point in country_soil_points.iterrows():
-        
+
         # Get the crop fractional area for this region
         cropland_row = cropland_df.loc[params["country"], index[0], index[1], index[2]]
         crop_fractional_area = cropland_row[params["crop_name"].lower()+"_fractional_area"]
-        
+
         # Get the input/output files
-        inputfile = point["filename"]        
+        inputfile = point["filename"]
         season_file = f"{TMP_DIR}/{inputfile}.season"
-        summary_file = f"{TMP_DIR}/{inputfile}.summary"        
+        summary_file = f"{TMP_DIR}/{inputfile}.summary"
 
         # ** Run Cycles **
-        cmd = [CYCLES_RUN_SCRIPT, 
+        cmd = [CYCLES_RUN_SCRIPT,
                '-i1', f"{SOIL_WEATHER_DIR}/{inputfile}",
                '-i2', CROPS_FILE,
                '-o1', season_file,
@@ -59,9 +59,9 @@ def run_cycles(params):
         except subprocess.CalledProcessError as exc:
               print("Status : FAIL", exc.returncode, exc.output)
               continue
-        
+
         # Load the output file
-        exdf = get_dataframe_for_execution_result(season_file, index, params, 
+        exdf = get_dataframe_for_execution_result(season_file, index, params,
                                                 ["grain_yield", "cum._n_stress", "actual_tr", "potential_tr"])
 
         # Filter/Modify/Add Columns
@@ -69,11 +69,11 @@ def run_cycles(params):
         exdf["water_stress"] = 1 - exdf["actual_tr"]/exdf["potential_tr"]
         exdf = exdf.rename(columns={'cum._n_stress': 'nitrogen_stress'})
         exdf = exdf.drop(['actual_tr', 'potential_tr'], axis = 1)
-        
+
         # Write output
         if first:
             exdf.to_csv(OUTPUT_FILE, index=False)
-            first = False  
+            first = False
         else:
             exdf.to_csv(OUTPUT_FILE, mode='a', header=False, index=False)
 
@@ -107,13 +107,13 @@ def _main():
     parser = argparse.ArgumentParser(
         description="Cycles execution for a country"
     )
-    parser.add_argument("--country", dest="country", default="Kenya", help="Crop name")    
+    parser.add_argument("--country", dest="country", default="Kenya", help="Country name")
     parser.add_argument("--crop-name", dest="crop_name", default="Maize", help="Crop name")
-    parser.add_argument("--start-year", dest="start_year", default=2000, help="Simulation start year")
-    parser.add_argument("--end-year", dest="end_year", default=2020, help="Simulation end year")    
-    parser.add_argument("--start-planting-day", dest="start_planting_day", default=103, help="Start planting date")
-    parser.add_argument("--fertilizer-rate", dest="fertilizer_rate", default=50.00, help="Fertilizer rate")
-    parser.add_argument("--weed-fraction", dest="weed_fraction", default=0.2, help="Weed fraction")
+    parser.add_argument("--start-year", dest="start_year", default="2000", help="Simulation start year")
+    parser.add_argument("--end-year", dest="end_year", default="2020", help="Simulation end year")
+    parser.add_argument("--start-planting-day", dest="start_planting_day", default="103", help="Start planting date")
+    parser.add_argument("--fertilizer-rate", dest="fertilizer_rate", default="50.00", help="Fertilizer rate")
+    parser.add_argument("--weed-fraction", dest="weed_fraction", default="0.2", help="Weed fraction")
     args = parser.parse_args()
     run_cycles(vars(args))
 
