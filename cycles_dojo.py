@@ -10,7 +10,7 @@ import argparse
 import subprocess
 
 RESOURCES_FILE = "data/HOAResources.csv"
-CROPLAND_FILE = "data/HOACropland.csv"
+CROPLAND_FILE = "data/HOACropland_new.csv"
 CYCLES_RUN_SCRIPT = "bin/cycles/run"
 TMP_DIR = "tmp"
 OUTPUT_FILE = "outputs/cycles_results.csv"
@@ -33,6 +33,13 @@ def run_cycles(params):
         # Get the crop fractional area for this region
         cropland_row = cropland_df.loc[params["country"], index[0], index[1], index[2]]
         crop_fractional_area = cropland_row[params["crop_name"].lower()+"_fractional_area"]
+        crop_pd = cropland_row[params["crop_name"].lower()+"_pd"]
+        crop_grain_yield = cropland_row[params["crop_name"].lower()+"_grain_yield"]
+
+        # Calculate planting date
+        planting_day = int(crop_pd) + int(params["start_planting_day"])
+        planting_day = planting_day - 365 if planting_day > 365 else planting_day
+        planting_day = planting_day + 365 if planting_day < 0 else planting_day
 
         # Get the input/output files
         inputfile = point["filename"]
@@ -48,7 +55,7 @@ def run_cycles(params):
                '-p1', params["start_year"],
                '-p2', params["end_year"],
                '-p3', params["crop_name"],
-               '-p4', params["start_planting_day"],
+               '-p4', str(planting_day),
                '-p5', params["fertilizer_rate"],
                '-p6', params["weed_fraction"],
                '-p7', "False"
