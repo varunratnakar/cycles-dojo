@@ -10,7 +10,7 @@ import argparse
 import subprocess
 
 RESOURCES_FILE = "data/HOAResources.csv"
-CROPLAND_FILE = "data/HOACropland_new.csv"
+CROPLAND_FILE = "data/HOACropland.csv"
 CYCLES_RUN_SCRIPT = "bin/cycles/run"
 TMP_DIR = "tmp"
 OUTPUT_FILE = "outputs/cycles_results.csv"
