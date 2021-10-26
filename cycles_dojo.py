@@ -117,6 +117,8 @@ def _main():
     args = parser.parse_args()
     run_cycles(vars(args))
 
+    os.rename(OUTPUT_FILE, "outputs/%s.%s.%s.csv" % (args.country, args.crop_name, args.start_planting_day))
+
 
 if __name__ == "__main__":
     _main()

@@ -87,7 +87,7 @@ def _generate_inputs(
 
 
 def _launch(prefix, baseline, **kwargs):
-    cmd = f"{basedir}/Cycles -s -l 1 cycles-run" if baseline == "True" else f"{basedir}/Cycles cycles-run"
+    cmd = f"{basedir}/Cycles -s cycles-run" if baseline == "True" else f"{basedir}/Cycles cycles-run"
     print(cmd)
     try:
         output = subprocess.check_output(
