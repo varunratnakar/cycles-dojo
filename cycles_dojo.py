@@ -32,9 +32,15 @@ def run_cycles(params):
 
         # Get the crop fractional area for this region
         cropland_row = cropland_df.loc[params["country"], index[0], index[1], index[2]]
-        crop_fractional_area = cropland_row[params["crop_name"].lower()+"_fractional_area"]
-        crop_pd = cropland_row[params["crop_name"].lower()+"_pd"]
-        crop_grain_yield = cropland_row[params["crop_name"].lower()+"_grain_yield"]
+
+        try:
+            crop_pd = cropland_row[params["crop_name"].lower()+"_pd"]
+            crop_grain_yield = cropland_row[params["crop_name"].lower()+"_grain_yield"]
+            crop_fractional_area = cropland_row[params["crop_name"].lower()+"_fractional_area"]
+        except KeyError:
+            crop_pd = 110
+            crop_grain_yield = 1.0
+            crop_fractional_area = 0.0
 
         # Calculate planting date
         planting_day = int(crop_pd) + int(params["start_planting_day"])
