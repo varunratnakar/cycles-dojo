@@ -45,7 +45,7 @@ def run_cycles(params):
         # Calculate planting date
         planting_day = int(crop_pd) + int(params["start_planting_day"])
         planting_day = planting_day - 365 if planting_day > 365 else planting_day
-        planting_day = planting_day + 365 if planting_day < 0 else planting_day
+        planting_day = planting_day + 365 if planting_day <= 0 else planting_day
 
         # Get the input/output files
         inputfile = point["filename"]
