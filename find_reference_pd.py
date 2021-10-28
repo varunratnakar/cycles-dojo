@@ -8,8 +8,6 @@ CROPLAND_FILE = "data/HOACropland.csv"
 OUTPUT_FILE = "data/HOACropland_new.csv"
 
 countries = [
-    'Djibouti',
-    'Eritrea',
     'Kenya',
     'Ethiopia',
     'South Sudan',
@@ -18,7 +16,7 @@ countries = [
     'Somalia',
     'Eritrea',
     'Djibouti',
-    ]
+]
 
 crops = ['Maize']
 
@@ -37,43 +35,71 @@ pds = [
     '345',
 ]
 
+def reference_pd(row):
+    '''
+    Find the date with maximum 5-month moving average yield to be the reference planting date.
+    '''
+    length = 12
+    half_window = 2
+
+    max_yield = -999
+    ref_day = -999
+    for m in range(length):
+        # Adjust to avoid using indices larger than 11
+        m = m - length if m >= length - half_window else m
+
+        yield_ma = row[np.r_[m - half_window:m + half_window + 1]].mean()
+        if yield_ma > max_yield:
+            max_yield = yield_ma
+            ref_day = row.index[m]
+
+    return (row[ref_day], ref_day)
+
 # Open cropland file
 cropland_df = pandas.read_csv(CROPLAND_FILE)
 cropland_df.fillna('NaN', inplace=True)     # Fill NaN values incase 'admin3' does not exist
-cropland_df.set_index(['country', 'admin1', 'admin2', 'admin3'], inplace=True)
 
 for crop in crops:
-    # Create empty data frame
-    results = pandas.DataFrame()
-
+    # Create an empty data frame to contain all countries/planting dates
+    pd_df = pandas.DataFrame()
     for country in countries:
+        print (country, crop)
+        first = 1
         for pd in pds:
             # Read output files
-            output_df = pandas.read_csv('outputs/%s.%s.%s.csv' % (country, crop, pd), usecols=range(1,9))
+            output_df = pandas.read_csv('outputs/%s.%s.%s.csv' % (country, crop, pd), usecols=range(1,6))
             output_df.fillna('NaN', inplace=True)   # Fill NaN values incase 'admin3' does not exist
-            output_df['pd'] = pd    # Add planting date as a column
 
-            # Combine all results
-            results = results.append(output_df)
+            # Calculate mean grain yield over all simulation years
+            output_df = pandas.DataFrame(output_df.groupby(['country', 'admin1', 'admin2', 'admin3']).mean())
 
-    # Calculate mean grain yield for each planting date
-    results = pandas.DataFrame(results.groupby(['country', 'admin1', 'admin2', 'admin3', 'pd'])['grain_yield'].mean())
+            # Rename the column to planting date, which can be merged into pd_df
+            output_df.rename(columns={"grain_yield": str(pd)}, inplace=True)
 
-    # Reset 'pd' to regular column
-    results = results.reset_index(level=['pd'])
+            # Add all planting dates to one data frame
+            if first == 1:
+                _result_df = output_df
+                first = 0
+            else:
+                _result_df = _result_df.merge(output_df, how='inner', on=['country', 'admin1', 'admin2', 'admin3'])
 
-    # Find maximum yield
-    ref_pd = results[results.groupby(['country', 'admin1', 'admin2', 'admin3'])['grain_yield'].transform(max) == results['grain_yield']]
+        # Combine all results
+        pd_df = pd_df.append(_result_df)
+
+    # Find reference planting dates and yields
+    pd_df[['grain_yield','pd']] = pd_df.apply(lambda row: pandas.Series(reference_pd(row)), axis=1)
+
+    # Remove yields of each month
+    pd_df.drop(columns=pds, inplace=True)
 
     # Rename pd and grain_yield columns to each crop
     crop = crop.strip().lower().replace(' ', '_')
-    ref_pd.rename(columns={'pd': '%s_pd' %(crop), 'grain_yield': '%s_grain_yield' %(crop)}, inplace=True)
+    pd_df.rename(columns={'pd': '%s_pd' %(crop), 'grain_yield': '%s_grain_yield' %(crop)}, inplace=True)
 
     # Add planting dates and yields to cropland data
-    df = cropland_df.merge(ref_pd, how = 'inner', on = ['country', 'admin1', 'admin2', 'admin3'])
+    df = cropland_df.merge(pd_df, how='inner', on=['country', 'admin1', 'admin2', 'admin3'])
 
-    # Write to output file
-    df = df.reset_index(level=['country', 'admin1', 'admin2', 'admin3'])
-    df.replace('NaN', '', regex=True, inplace=True)
+# Write to output file
+df.replace('NaN', '', regex=True, inplace=True)
 
-    df.to_csv(OUTPUT_FILE, index=False)
+df.to_csv(OUTPUT_FILE, index=False)
