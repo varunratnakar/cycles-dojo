@@ -53,7 +53,7 @@ def reference_pd(row):
             max_yield = yield_ma
             ref_day = row.index[m]
 
-    return (row[ref_day], ref_day)
+    return (max_yield, ref_day)
 
 # Open cropland file
 cropland_df = pandas.read_csv(CROPLAND_FILE)
