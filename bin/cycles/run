@@ -26,13 +26,12 @@ unzip "$INPUTS1" -d input
 pushd input
 weather=$(find . -name *.weather -printf "%f\n")
 soil=$(find . -name *.soil -printf "%f\n")
-ln -s ../data data
 popd
 #backup the input that we are going to use in the future
 cp -r input/ input_future/
 
 # run cycles baseline
-python3 $BASEDIR/cycles-wrapper.py --start-year $PARAMS1 --end-year $PARAMS2 --baseline True --crop $PARAMS3 --start-planting-date $PARAMS4 --end-planting-date 0 --fertilizer-rate 50 --weed-fraction $PARAMS6 --forcing $PARAMS7 --weather-file $weather $INPUTS2 $soil
+python3 $BASEDIR/cycles-wrapper.py --start-year $PARAMS1 --end-year $PARAMS2 --baseline True --crop $PARAMS3 --start-planting-date $PARAMS4 --end-planting-date 0 --fertilizer-rate 50 --weed-fraction $PARAMS6 --forcing $PARAMS7 --weather-file $weather ${INPUTS2#"data/"} $soil
 checkExitCode
 
 ## clean up folders and prepare input folder for cycles run
