@@ -15,6 +15,132 @@ log = logging.getLogger()
 global basedir
 basedir = os.path.dirname(__file__)
 
+KILL_CROP, FERTILIZE, TILLAGE1, PLANT_CROP, TILLAGE2, WEED = range(6)
+
+def _adjust_doy(doy):
+
+    doy = doy - 365 if doy > 365 else doy
+    doy = doy + 365 if doy < 1 else doy
+
+    return doy
+
+def _get_doy(op):
+
+    return op['doy']
+
+
+def _op_str(op):
+
+    if op['type'] == KILL_CROP:
+        strs = 'TILLAGE\n'
+        strs += '%-20s%d\n' %('YEAR', 1)
+        strs += '%-20s%d\n' %('DOY', op['doy'])
+        strs += '%-20s%s\n' %('TOOL', 'Kill_Crop')
+        strs += '%-20s%s\n' %('DEPTH', '0')
+        strs += '%-20s%s\n' %('SOIL_DISTURB_RATIO', '0')
+        strs += '%-20s%s\n' %('MIXING_EFFICIENCY', '0')
+        strs += '%-20s%s\n' %('CROP_NAME', 'N/A')
+        strs += '%-20s%s\n' %('FRAC_THERMAL_TIME', '0.0')
+        strs += '%-20s%s\n' %('KILL_EFFICIENCY', '0.0')
+        strs += '%-20s%s\n' %('GRAIN_HARVEST', '0')
+        strs += '%-20s%s\n\n' %('FORAGE_HARVEST', '0.0')
+        return strs
+    elif op['type'] == FERTILIZE:
+        strs= 'FIXED_FERTILIZATION\n'
+        strs += '%-20s%s\n' % ('YEAR', '1')
+        strs += '%-20s%s\n' % ('DOY', op['doy'])
+        strs += '%-20s%s\n' % ('SOURCE', '32-00-00')
+        strs += '%-20s%s\n' % ('MASS', op['fertilizer_rate'])
+        strs += '%-20s%s\n' % ('FORM', 'Solid')
+        strs += '%-20s%s\n' % ('METHOD', 'Incorporated')
+        strs += '%-20s%s\n' % ('LAYER', '2')
+        strs += '%-20s%s\n' % ('C_Organic', '0')
+        strs += '%-20s%s\n' % ('C_Charcoal', '0')
+        strs += '%-20s%s\n' % ('N_Organic', '0')
+        strs += '%-20s%s\n' % ('N_Charcoal', '0')
+        strs += '%-20s%s\n' % ('N_NH4', '1')
+        strs += '%-20s%s\n' % ('N_NO3', '0')
+        strs += '%-20s%s\n' % ('P_Organic', '0')
+        strs += '%-20s%s\n' % ('P_CHARCOAL', '0')
+        strs += '%-20s%s\n' % ('P_INORGANIC', '0')
+        strs += '%-20s%s\n' % ('K', '0')
+        strs += '%-20s%s\n\n' % ('S', '0')
+        return strs
+    elif op['type'] == TILLAGE1:
+        strs = 'TILLAGE\n'
+        strs += '%-20s%s\n' %('YEAR', '1')
+        strs += '%-20s%d\n' %('DOY', op['doy'])
+        strs += '%-20s%s\n' %('TOOL', 'Hand_hoeing')
+        strs += '%-20s%s\n' %('DEPTH', '0.11')
+        strs += '%-20s%s\n' %('SOIL_DISTURB_RATIO', '25')
+        strs += '%-20s%s\n' %('MIXING_EFFICIENCY', '0.33')
+        strs += '%-20s%s\n' %('CROP_NAME', 'N/A')
+        strs += '%-20s%s\n' %('FRAC_THERMAL_TIME', '0.0')
+        strs += '%-20s%s\n' %('KILL_EFFICIENCY', '0.0')
+        strs += '%-20s%s\n' %('GRAIN_HARVEST', '0')
+        strs += '%-20s%s\n\n' %('FORAGE_HARVEST', '0.0')
+        return strs
+    elif op['type'] == PLANT_CROP:
+        strs = 'PLANTING\n'
+        strs += '%-20s%s\n' % ('YEAR', '1')
+        strs += '%-20s%d\n' % ('DOY', op['doy'])
+        strs += '%-20s%s\n' % ('END_DOY', op['end_planting_date'])
+        strs += '%-20s%s\n' % ('MAX_SMC', '-999')
+        strs += '%-20s%s\n' % ('MIN_SMC', '-999')
+        strs += '%-20s%s\n' % ('MIN_SOIL_TEMP', '-999')
+        strs += '%-20s%s\n' % ('CROP', op['crop'])
+        strs += '%-20s%s\n' % ('USE_AUTO_IRR', '0')
+        strs += '%-20s%s\n' % ('USE_AUTO_FERT', '0')
+        strs += '%-20s%s\n' % ('FRACTION', '0.67')
+        strs += '%-20s%s\n' % ('CLIPPING_START', '1')
+        strs += '%-20s%s\n\n' % ('CLIPPING_END', '366')
+        return strs
+    elif op['type'] == TILLAGE2:
+        strs = 'TILLAGE\n'
+        strs += '%-20s%s\n' %('YEAR', '1')
+        strs += '%-20s%d\n' %('DOY', op['doy'])
+        strs += '%-20s%s\n' %('TOOL', 'Hand_hoeing_weeding')
+        strs += '%-20s%s\n' %('DEPTH', '0.06')
+        strs += '%-20s%s\n' %('SOIL_DISTURB_RATIO', '15')
+        strs += '%-20s%s\n' %('MIXING_EFFICIENCY', '0.25')
+        strs += '%-20s%s\n' %('CROP_NAME', 'N/A')
+        strs += '%-20s%s\n' %('FRAC_THERMAL_TIME', '0.0')
+        strs += '%-20s%s\n' %('KILL_EFFICIENCY', '0.0')
+        strs += '%-20s%s\n' %('GRAIN_HARVEST', '0')
+        strs += '%-20s%s\n\n' %('FORAGE_HARVEST', '0.0')
+        return strs
+    elif op['type'] == WEED:
+        if float(op['weed_fraction']) > 0:
+            strs = 'PLANTING\n'
+            strs += '%-20s%s\n' % ('YEAR', '1')
+            strs += '%-20s%d\n' % ('DOY', op['doy'])
+            strs += '%-20s%s\n' % ('END_DOY', '-999')
+            strs += '%-20s%s\n' % ('MAX_SMC', '-999')
+            strs += '%-20s%s\n' % ('MIN_SMC', '-999')
+            strs += '%-20s%s\n' % ('MIN_SOIL_TEMP', '-999')
+            strs += '%-20s%s\n' % ('CROP', 'C3_weed')
+            strs += '%-20s%s\n' % ('USE_AUTO_IRR', '0')
+            strs += '%-20s%s\n' % ('USE_AUTO_FERT', '0')
+            strs += '%-20s%s\n' % ('FRACTION', op['weed_fraction'])
+            strs += '%-20s%s\n' % ('CLIPPING_START', '-999')
+            strs += '%-20s%s\n\n' % ('CLIPPING_END', '-999')
+            strs = 'PLANTING\n'
+            strs += '%-20s%s\n' % ('YEAR', '1')
+            strs += '%-20s%d\n' % ('DOY', op['doy'])
+            strs += '%-20s%s\n' % ('END_DOY', '-999')
+            strs += '%-20s%s\n' % ('MAX_SMC', '-999')
+            strs += '%-20s%s\n' % ('MIN_SMC', '-999')
+            strs += '%-20s%s\n' % ('MIN_SOIL_TEMP', '-999')
+            strs += '%-20s%s\n' % ('CROP', 'C4_weed')
+            strs += '%-20s%s\n' % ('USE_AUTO_IRR', '0')
+            strs += '%-20s%s\n' % ('USE_AUTO_FERT', '0')
+            strs += '%-20s%s\n' % ('FRACTION', op['weed_fraction'])
+            strs += '%-20s%s\n' % ('CLIPPING_START', '-999')
+            strs += '%-20s%s\n\n' % ('CLIPPING_END', '-999')
+        else:
+            strs = ''
+        return strs
+
 def _generate_inputs(
         prefix,
         start_year,
@@ -54,32 +180,23 @@ def _generate_inputs(
             f.write(result)
 
     # process Operation file
-    operation_contents = ""
-    with open(f"{basedir}/template.operation") as t_op_file:
-        src = Template(t_op_file.read())
-        op_data = {
-            "year_count": 1,
-            "crop_name": crop,
-            "fertilization_date": int(start_planting_date) - 10,
-            "fertilization_rate": fertilizer_rate,
-            "start_planting_date": start_planting_date,
-            "end_planting_date": end_planting_date,
-            "tillage_date": int(start_planting_date) + 20,
-        }
-        result = src.substitute(op_data)
-        operation_contents += result + "\n"
+    ## set operation days and other parameters
+    ops = [
+        {'type': KILL_CROP, 'doy': _adjust_doy(int(start_planting_date) - 10)},
+        {'type': FERTILIZE, 'doy': _adjust_doy(int(start_planting_date) - 10), 'fertilizer_rate': fertilizer_rate},
+        {'type': TILLAGE1, 'doy': _adjust_doy(int(start_planting_date) - 10)},
+        {'type': PLANT_CROP, 'doy': _adjust_doy(int(start_planting_date)), 'crop': crop, 'end_planting_date': end_planting_date},
+        {'type': TILLAGE2, 'doy': _adjust_doy(int(start_planting_date) + 20)},
+        {'type': WEED, 'doy': _adjust_doy(int(start_planting_date) + 7), "weed_fraction": weed_fraction},
+    ]
 
-        # handling weeds
-        if float(weed_fraction) > 0:
-            with open(f"{basedir}/template-weed.operation") as t_wd_file:
-                wd_src = Template(t_wd_file.read())
-                wd_data = {
-                    "year_count": 1,
-                    "weed_planting_date": int(start_planting_date) + 7,
-                    "weed_fraction": weed_fraction
-                }
-                wd_result = wd_src.substitute(wd_data)
-                operation_contents += wd_result + "\n"
+    ## sort all operations by days of year
+    ops.sort(key=_get_doy)
+
+    operation_contents = ""
+
+    for op in ops:
+        operation_contents += _op_str(op)
 
     # writing operations file
     with open("./input/" + op_file, "w") as f:
