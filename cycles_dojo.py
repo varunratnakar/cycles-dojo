@@ -81,6 +81,7 @@ def run_cycles(params):
         exdf["crop_production"] = exdf["grain_yield"]*crop_fractional_area
         exdf["water_stress"] = 1 - exdf["actual_tr"]/exdf["potential_tr"]
         exdf["relative_yield"] = exdf["grain_yield"] / crop_grain_yield
+        exdf["planting_day"] = planting_day
         exdf = exdf.rename(columns={'cum._n_stress': 'nitrogen_stress'})
         exdf = exdf.drop(['actual_tr', 'potential_tr'], axis = 1)
 
