@@ -142,10 +142,8 @@ def _op_str(op):
         return strs
 
 def _generate_inputs(
-        prefix,
         start_year,
         end_year,
-        baseline,
         crop,
         start_planting_date,
         end_planting_date,
@@ -173,7 +171,7 @@ def _generate_inputs(
             "operation_file": op_file,
             "soil_file": soil_file,
             "weather_file": weather_file,
-            "reinit": 0 if baseline == "True" else 1,
+            "reinit": 0,
         }
         result = src.substitute(ctrl_data)
         with open("./input/" + ctrl_file, "w") as f:
@@ -203,8 +201,8 @@ def _generate_inputs(
         f.write(operation_contents)
 
 
-def _launch(prefix, baseline, **kwargs):
-    cmd = f"{basedir}/Cycles -s -l 1 cycles-run" if baseline == "True" else f"{basedir}/Cycles cycles-run"
+def _launch(**kwargs):
+    cmd = f"{basedir}/Cycles -s cycles-run"
     print(cmd)
     try:
         output = subprocess.check_output(
@@ -222,7 +220,6 @@ def _main():
     )
     parser.add_argument("--start-year", dest="start_year", default=2000, help="Simulation start year")
     parser.add_argument("--end-year", dest="end_year", default=2017, help="Simulation end year")
-    parser.add_argument("-b", "--baseline", dest="baseline", default=False, help="Whether this is a baseline execution")
     parser.add_argument("-c", "--crop", dest="crop", default="Maize", help="Crop name")
     parser.add_argument("-s", "--start-planting-date", dest="start_planting_date", default=100, help="Start planting date")
     parser.add_argument("-e", "--end-planting-date", dest="end_planting_date", default=0, help="End planting date") # Changed default to 0, which changes to -999 below, and implies automatic end planting date
@@ -235,14 +232,11 @@ def _main():
     parser.add_argument("soil_file", help="Soil file")
     args = parser.parse_args()
 
-    # setting prefix
-    prefix = "_baseline" if args.baseline == "True" else ""
-
     if args.end_planting_date == 0:
         args.end_planting_date = -999
 
-    _generate_inputs(prefix, **vars(args))
-    _launch(prefix, **vars(args))
+    _generate_inputs(**vars(args))
+    _launch(**vars(args))
 
 
 if __name__ == "__main__":
