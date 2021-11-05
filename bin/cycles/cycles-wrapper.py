@@ -180,9 +180,9 @@ def _generate_inputs(
     # process Operation file
     ## set operation days and other parameters
     ops = [
-        {'type': KILL_CROP, 'doy': _adjust_doy(int(start_planting_date) - 10)},
-        {'type': FERTILIZE, 'doy': _adjust_doy(int(start_planting_date) - 10), 'fertilizer_rate': fertilizer_rate},
-        {'type': TILLAGE1, 'doy': _adjust_doy(int(start_planting_date) - 10)},
+        {'type': KILL_CROP, 'doy': _adjust_doy(int(start_planting_date))},
+        {'type': FERTILIZE, 'doy': _adjust_doy(int(start_planting_date)), 'fertilizer_rate': fertilizer_rate},
+        {'type': TILLAGE1, 'doy': _adjust_doy(int(start_planting_date))},
         {'type': PLANT_CROP, 'doy': _adjust_doy(int(start_planting_date)), 'crop': crop, 'end_planting_date': end_planting_date},
         {'type': TILLAGE2, 'doy': _adjust_doy(int(start_planting_date) + 20)},
         {'type': WEED, 'doy': _adjust_doy(int(start_planting_date) + 7), "weed_fraction": weed_fraction},
