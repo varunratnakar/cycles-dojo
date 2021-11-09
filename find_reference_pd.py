@@ -18,7 +18,11 @@ countries = [
     'Djibouti',
 ]
 
-crops = ['Maize']
+crops = [
+    'Maize',
+    'Sorghum',
+    'Cassava',
+]
 
 pds = [
     '15',
@@ -97,9 +101,9 @@ for crop in crops:
     pd_df.rename(columns={'pd': '%s_pd' %(crop), 'grain_yield': '%s_grain_yield' %(crop)}, inplace=True)
 
     # Add planting dates and yields to cropland data
-    df = cropland_df.merge(pd_df, how='inner', on=['country', 'admin1', 'admin2', 'admin3'])
+    cropland_df = cropland_df.merge(pd_df, how='inner', on=['country', 'admin1', 'admin2', 'admin3'])
 
 # Write to output file
-df.replace('NaN', '', regex=True, inplace=True)
+cropland_df.replace('NaN', '', regex=True, inplace=True)
 
-df.to_csv(OUTPUT_FILE, index=False)
+cropland_df.to_csv(OUTPUT_FILE, index=False)
