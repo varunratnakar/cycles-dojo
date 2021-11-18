@@ -18,6 +18,15 @@ CROPS_FILE = "data/crops-horn-of-africa.crop"
 SOIL_WEATHER_DIR = "data/soil_weather"
 
 def run_cycles(params):
+    crops = [
+        'Maize',
+        'Sorghum',
+        'Cassava',
+        'Millet',
+        'SpringLentil',
+        'Potato',
+    ]
+
     cropland_df = pd.read_csv(CROPLAND_FILE)
     cropland_df.set_index(['country', 'admin1', 'admin2', 'admin3'], inplace=True)
 
@@ -33,19 +42,23 @@ def run_cycles(params):
         # Get the crop fractional area for this region
         cropland_row = cropland_df.loc[params["country"], index[0], index[1], index[2]]
 
-        try:
-            crop_pd = cropland_row[params["crop_name"].lower()+"_pd"]
-            crop_grain_yield = cropland_row[params["crop_name"].lower()+"_grain_yield"]
-            crop_fractional_area = cropland_row[params["crop_name"].lower()+"_fractional_area"]
-        except KeyError:
-            crop_pd = 110
-            crop_grain_yield = 1.0
-            crop_fractional_area = 0.0
+        crop_pd = cropland_row[params["crop_name"].lower()+"_pd"]
+        crop_grain_yield = cropland_row[params["crop_name"].lower()+"_grain_yield"]
+        crop_fractional_area = cropland_row[params["crop_name"].lower()+"_fractional_area"]
 
         # Calculate planting date
         planting_day = int(crop_pd) + int(params["start_planting_day"])
         planting_day = planting_day - 365 if planting_day > 365 else planting_day
         planting_day = planting_day + 365 if planting_day <= 0 else planting_day
+
+        # Calculate reference and current food production
+        reference_production = 0.0
+        production = 0.0
+        for c in crops:
+            reference_production += cropland_row[c.lower()+"_grain_yield"] * cropland_row[c.lower()+"_fractional_area"]
+
+            if c != params["crop_name"]:
+                production += cropland_row[c.lower()+"_grain_yield"] * cropland_row[c.lower()+"_fractional_area"]
 
         # Get the input/output files
         inputfile = point["filename"]
@@ -82,6 +95,8 @@ def run_cycles(params):
         exdf["water_stress"] = 1 - exdf["actual_tr"]/exdf["potential_tr"]
         exdf["relative_yield"] = exdf["grain_yield"] / crop_grain_yield
         exdf["planting_day"] = planting_day
+        exdf["impact"] = (production + exdf["crop_production"]) / reference_production - 1.0
+
         exdf = exdf.rename(columns={'cum._n_stress': 'nitrogen_stress'})
         exdf = exdf.drop(['actual_tr', 'potential_tr'], axis = 1)
 
