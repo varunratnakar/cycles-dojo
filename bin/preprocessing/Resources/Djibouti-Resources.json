@@ -1,0 +1,131 @@
+{
+    "result": "success",
+    "dataset": {
+        "dataset_id": "70f846c9-514a-44f8-b745-5e93148d4b52",
+        "resources": [
+            {
+                "resource_id": "1f44cbe3-ebb1-4065-a14a-65653abcf48b",
+                "resource_name": "cycles-11.79167-42.70833.soil_weather.zip",
+                "resource_data_url": "https://data.mint.isi.edu/files/cycles-input-data/africa/soil_weather/cycles-11.79167-42.70833.soil_weather.zip",
+                "resource_created_at": "2021-07-13 09:26:53",
+                "resource_type": "Zip",
+                "resource_metadata": {
+                    "spatial_coverage": {
+                        "type": "Point",
+                        "value": {
+                            "x": "42.708333333000041",
+                            "y": "11.791666667000072"
+                        }
+                    },
+                    "temporal_coverage": {
+                        "end_time": "2021-03-30T00:00:00",
+                        "start_time": "2000-01-01T00:00:00"
+                    }
+                }
+            },
+            {
+                "resource_id": "7ed195f7-0311-42f8-a79c-c37ecb38903a",
+                "resource_name": "cycles-11.95833-42.87500.soil_weather.zip",
+                "resource_data_url": "https://data.mint.isi.edu/files/cycles-input-data/africa/soil_weather/cycles-11.95833-42.87500.soil_weather.zip",
+                "resource_created_at": "2021-07-13 09:26:53",
+                "resource_type": "Zip",
+                "resource_metadata": {
+                    "spatial_coverage": {
+                        "type": "Point",
+                        "value": {
+                            "x": "42.875000000000057",
+                            "y": "11.958333333000041"
+                        }
+                    },
+                    "temporal_coverage": {
+                        "end_time": "2021-03-30T00:00:00",
+                        "start_time": "2000-01-01T00:00:00"
+                    }
+                }
+            },
+            {
+                "resource_id": "b3575f99-e771-476a-8d69-13c7d952e928",
+                "resource_name": "cycles-11.95833-43.04167.soil_weather.zip",
+                "resource_data_url": "https://data.mint.isi.edu/files/cycles-input-data/africa/soil_weather/cycles-11.95833-43.04167.soil_weather.zip",
+                "resource_created_at": "2021-07-13 09:26:53",
+                "resource_type": "Zip",
+                "resource_metadata": {
+                    "spatial_coverage": {
+                        "type": "Point",
+                        "value": {
+                            "x": "43.041666667000072",
+                            "y": "11.958333333000041"
+                        }
+                    },
+                    "temporal_coverage": {
+                        "end_time": "2021-03-30T00:00:00",
+                        "start_time": "2000-01-01T00:00:00"
+                    }
+                }
+            }
+        ]
+    },
+    "dataset_id": "70f846c9-514a-44f8-b745-5e93148d4b52",
+    "resources": [
+        {
+            "resource_id": "1f44cbe3-ebb1-4065-a14a-65653abcf48b",
+            "resource_name": "cycles-11.79167-42.70833.soil_weather.zip",
+            "resource_data_url": "https://data.mint.isi.edu/files/cycles-input-data/africa/soil_weather/cycles-11.79167-42.70833.soil_weather.zip",
+            "resource_created_at": "2021-07-13 09:26:53",
+            "resource_type": "Zip",
+            "resource_metadata": {
+                "spatial_coverage": {
+                    "type": "Point",
+                    "value": {
+                        "x": "42.708333333000041",
+                        "y": "11.791666667000072"
+                    }
+                },
+                "temporal_coverage": {
+                    "end_time": "2021-03-30T00:00:00",
+                    "start_time": "2000-01-01T00:00:00"
+                }
+            }
+        },
+        {
+            "resource_id": "7ed195f7-0311-42f8-a79c-c37ecb38903a",
+            "resource_name": "cycles-11.95833-42.87500.soil_weather.zip",
+            "resource_data_url": "https://data.mint.isi.edu/files/cycles-input-data/africa/soil_weather/cycles-11.95833-42.87500.soil_weather.zip",
+            "resource_created_at": "2021-07-13 09:26:53",
+            "resource_type": "Zip",
+            "resource_metadata": {
+                "spatial_coverage": {
+                    "type": "Point",
+                    "value": {
+                        "x": "42.875000000000057",
+                        "y": "11.958333333000041"
+                    }
+                },
+                "temporal_coverage": {
+                    "end_time": "2021-03-30T00:00:00",
+                    "start_time": "2000-01-01T00:00:00"
+                }
+            }
+        },
+        {
+            "resource_id": "b3575f99-e771-476a-8d69-13c7d952e928",
+            "resource_name": "cycles-11.95833-43.04167.soil_weather.zip",
+            "resource_data_url": "https://data.mint.isi.edu/files/cycles-input-data/africa/soil_weather/cycles-11.95833-43.04167.soil_weather.zip",
+            "resource_created_at": "2021-07-13 09:26:53",
+            "resource_type": "Zip",
+            "resource_metadata": {
+                "spatial_coverage": {
+                    "type": "Point",
+                    "value": {
+                        "x": "43.041666667000072",
+                        "y": "11.958333333000041"
+                    }
+                },
+                "temporal_coverage": {
+                    "end_time": "2021-03-30T00:00:00",
+                    "start_time": "2000-01-01T00:00:00"
+                }
+            }
+        }
+    ]
+}
